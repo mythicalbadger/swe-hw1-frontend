@@ -11,10 +11,6 @@ type UserInfo = {
 };
 
 const ProfilePage: React.FC = () => {
-    const {
-        token: {colorBgContainer, borderRadiusLG},
-    } = theme.useToken();
-
     const token = localStorage.getItem('token')
     const [userInfo, setUserInfo] = useState<UserInfo>({username: "", full_name: "", remaining_leave_days: ""});
 
