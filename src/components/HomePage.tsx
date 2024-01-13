@@ -3,6 +3,7 @@ import {ClockCircleOutlined, UserOutlined} from '@ant-design/icons';
 import {Button, Image, Layout, Menu} from 'antd';
 import RequestPage from "./RequestPage";
 import {useNavigate} from "react-router-dom";
+import ProfilePage from "./ProfilePage";
 
 const {Footer, Sider} = Layout;
 
@@ -23,6 +24,8 @@ const HomePage: React.FC = () => {
         switch (key) {
             case 'Requests':
                 return <RequestPage/>
+            case 'Profile':
+                return <ProfilePage/>
             default:
                 break;
         }
