@@ -7,11 +7,12 @@ import delay from "../utils/delay";
 const {Content} = Layout;
 
 type FieldType = {
+    full_name?: string;
     username?: string;
     password?: string;
 };
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -19,16 +20,14 @@ const LoginPage: React.FC = () => {
         try {
             setLoading(true);
 
-            const formData = new FormData();
-            formData.append("username", values.username);
-            formData.append("password", values.password);
-
-            const response = await axios.post('http://localhost:8000/token', formData);
-
+            await axios.post('http://localhost:8000/register', {
+                username: values.username,
+                full_name: values.full_name,
+                password: values.password
+            });
             message.success("Success");
-            localStorage.setItem("token", response.data["access_token"]);
             await delay(1000);
-            navigate("/")
+            navigate("/login")
         } catch (error: any) {
             console.error('Login failed', error);
 
@@ -50,8 +49,7 @@ const LoginPage: React.FC = () => {
                 <div
                     style={{
                         padding: 24,
-                        backgroundColor: "white",
-                        textAlign: "center"
+                        backgroundColor: "white"
                     }}
                 >
                     <Form
@@ -62,6 +60,13 @@ const LoginPage: React.FC = () => {
                         onFinish={onSubmit}
                         autoComplete="off"
                     >
+                        <Form.Item<FieldType>
+                            label="Name"
+                            name="full_name"
+                            rules={[{required: true, message: 'Please input your name!'}]}
+                        >
+                            <Input/>
+                        </Form.Item>
                         <Form.Item<FieldType>
                             label="Username"
                             name="username"
@@ -78,12 +83,11 @@ const LoginPage: React.FC = () => {
                             <Input.Password/>
                         </Form.Item>
 
-                        <Form.Item wrapperCol={{offset: 4, span: 16}}>
+                        <Form.Item wrapperCol={{offset: 8, span: 16}}>
                             <Button type="primary" htmlType="submit" loading={loading}>
                                 Submit
                             </Button>
                         </Form.Item>
-                        Don't have an account? <a href="/register">Register here.</a>
                     </Form>
                 </div>
             </Content>
@@ -91,4 +95,4 @@ const LoginPage: React.FC = () => {
     )
 };
 
-export default LoginPage;
+export default RegisterPage;
