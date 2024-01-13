@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {ClockCircleOutlined, UserOutlined} from '@ant-design/icons';
-import {Image, Layout, Menu} from 'antd';
+import {Button, Image, Layout, Menu} from 'antd';
 import RequestPage from "./RequestPage";
+import {useNavigate} from "react-router-dom";
 
 const {Footer, Sider} = Layout;
 
@@ -14,7 +15,9 @@ const items = [ClockCircleOutlined, UserOutlined].map(
     }),
 );
 
+
 const HomePage: React.FC = () => {
+    const navigate = useNavigate();
     const [selectedMenuItem, setSelectedMenuItem] = useState("Requests");
     const componentSwitch = (key: any) => {
         switch (key) {
@@ -24,6 +27,11 @@ const HomePage: React.FC = () => {
                 break;
         }
     };
+
+    const logout = () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+    }
 
     return (
         <Layout style={{height: "100vh"}}>
@@ -41,8 +49,19 @@ const HomePage: React.FC = () => {
                 <div className="demo-logo-vertical" style={{textAlign: "center", margin: "1em"}}>
                     <Image src={"calendar512.png"} width={"50%"}/>
                 </div>
-                <Menu theme="light" mode="inline" selectedKeys={[selectedMenuItem]} items={items}
-                      onClick={(e) => setSelectedMenuItem(e.key)}/>
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: "80%"}}>
+                    <Menu
+                        theme="light"
+                        mode="inline"
+                        selectedKeys={[selectedMenuItem]}
+                        items={items}
+                        onClick={(e) => setSelectedMenuItem(e.key)}
+                    />
+
+                    <div style={{textAlign: 'center', margin: '1em'}}>
+                        <Button type="primary" onClick={logout}>Logout</Button>
+                    </div>
+                </div>
             </Sider>
             <Layout>
                 {componentSwitch(selectedMenuItem)}
