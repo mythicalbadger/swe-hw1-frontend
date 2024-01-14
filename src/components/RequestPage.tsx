@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {Button, Layout, Table, theme} from 'antd';
 import Title from "antd/es/typography/Title";
-import { PlusOutlined } from '@ant-design/icons';
+import {PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
+import CreateRequestModal from "./CreateRequestModal";
 
 const {Content} = Layout;
 
@@ -13,12 +14,13 @@ const RequestPage: React.FC = () => {
 
     const token = localStorage.getItem('token')
     const [requests, setRequests] = useState([]);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
 
     React.useEffect(() => {
-        axios.get("http://localhost:8000/api/get-all-leave-requests",{ headers: { Authorization : `Bearer ${token}` }} ).then((response) => {
+        axios.get("http://localhost:8000/api/get-all-leave-requests", {headers: {Authorization: `Bearer ${token}`}}).then((response) => {
             setRequests(response.data)
         })
-    }, [])
+    }, [createModalOpen])
 
 
     const columns = [
@@ -63,10 +65,13 @@ const RequestPage: React.FC = () => {
                 }}
             >
                 <Title>Requests</Title>
-                <div style={{ textAlign: "right", marginRight: "1em", marginBottom: "2em"}}>
-                <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'}>
-                    New Request
-                </Button>
+                <div style={{textAlign: "right", marginRight: "1em", marginBottom: "2em"}}>
+                    <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'}
+                            onClick={() => setCreateModalOpen(true)}>
+                        New Request
+                    </Button>
+                    <CreateRequestModal createModalOpen={createModalOpen}
+                                        handleCancel={() => setCreateModalOpen(false)}/>
                 </div>
                 <Table dataSource={requests} columns={columns}/>;
             </div>

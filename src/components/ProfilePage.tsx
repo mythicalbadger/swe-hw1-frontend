@@ -35,15 +35,9 @@ const ProfilePage: React.FC = () => {
                     display: "block"
                 }}
             >
-                <p>
-                    Name: {userInfo.full_name}
-                </p>
-                <p>
-                    Username: {userInfo.username}
-                </p>
-                <p>
-                    Leave Days Remaining: {userInfo.remaining_leave_days}
-                </p>
+                <p>Name: {userInfo.full_name}</p>
+                <p>Username: {userInfo.username}</p>
+                <p>Leave Days Remaining: {userInfo.remaining_leave_days}</p>
             </div>
         </Content>
     );
