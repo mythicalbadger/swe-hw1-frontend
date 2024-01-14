@@ -26,23 +26,26 @@ const RequestPage: React.FC = () => {
     const columns = [
         {
             title: 'Employee ID',
-            dataIndex: 'id',
+            dataIndex: 'requester_id',
             key: 'id',
-        },
-        {
-            title: 'Name',
-            dataIndex: 'full_name',
-            key: 'name',
         },
         {
             title: 'Start Date',
             dataIndex: 'start_date',
             key: 'start',
+            render: ((date: string) => {
+                const dateObj: Date = new Date(date);
+                return `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`
+            })
         },
         {
             title: "End Date",
             dataIndex: "end_date",
-            key: "end"
+            key: "end",
+            render: ((date: string) => {
+                const dateObj: Date = new Date(date);
+                return `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`
+            })
         },
         {
             title: "Reason",
