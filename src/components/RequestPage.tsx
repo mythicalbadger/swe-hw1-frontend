@@ -110,7 +110,7 @@ const RequestPage: React.FC = () => {
         {
             title: "Reason",
             dataIndex: "reason",
-            key: "reason"
+            key: "reason",
         },
         {
             title: "Status",
