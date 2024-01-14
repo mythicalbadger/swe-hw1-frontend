@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import {Button, Layout, message, Popconfirm, Table, theme} from 'antd';
 import Title from "antd/es/typography/Title";
-import {PlusOutlined} from '@ant-design/icons';
+import {CheckOutlined, CloseOutlined, PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
 import CreateRequestModal from "./CreateRequestModal";
 import {EditOutlined, DeleteOutlined} from '@ant-design/icons';
 import delay from "../utils/delay";
+import {useNavigate} from "react-router-dom";
 
 const {Content} = Layout;
 
@@ -34,7 +35,14 @@ const RequestPage: React.FC = () => {
     const token = localStorage.getItem('token')
     const [requests, setRequests] = useState<any[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [userInfo, setUserInfo] = useState<UserInfo>({id: "", username: "", full_name: "", remaining_leave_days: "", is_admin: false});
+    const [userInfo, setUserInfo] = useState<UserInfo>({
+        id: "",
+        username: "",
+        full_name: "",
+        remaining_leave_days: "",
+        is_admin: false
+    });
+    const navigate = useNavigate();
 
     async function getUserData() {
         return await axios.get("http://localhost:8000/api/get-current-user", {headers: {Authorization: `Bearer ${token}`}});
@@ -71,6 +79,17 @@ const RequestPage: React.FC = () => {
     async function deleteRequest(request_id: string) {
         await axios.delete(`http://localhost:8000/api/delete-leave-request/${request_id}`, {headers: {Authorization: `Bearer ${token}`}});
         setRequests(requests.filter((request: TableKey) => request.id != request_id));
+    }
+
+    async function approveRequest(request_id: string) {
+        await axios.put(`http://localhost:8000/api/approve-leave-request/${request_id}`, null, {headers: {Authorization: `Bearer ${token}`}});
+        window.location.reload();
+    }
+
+    async function denyRequest(request_id: string) {
+        await axios.put(`http://localhost:8000/api/deny-leave-request/${request_id}`, null, {headers: {Authorization: `Bearer ${token}`}});
+        navigate("/");
+        window.location.reload();
     }
 
     React.useEffect(() => {
@@ -121,15 +140,27 @@ const RequestPage: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: TableKey) => {
+                if (userInfo.is_admin) {
+                    return (
+                        <span>
+                            <Button icon={<CheckOutlined/>}
+                                    style={{color: "green", borderColor: "green", marginRight: "5%"}}
+                                    onClick={() => approveRequest(record.id)}></Button>
+                            <Button icon={<CloseOutlined/>} style={{color: "red", borderColor: "red"}}
+                                    onClick={() => denyRequest(record.id)}></Button>
+                        </span>
+                    )
+                }
                 return (requests.length > 0 && record.requester_id === userInfo.id) ? (
                     <span>
-                        <Button icon={<EditOutlined/>}></Button>
+                        <Button icon={<EditOutlined/>} disabled={record.status != "pending"} style={{ marginRight: "5%" }}></Button>
                         <Popconfirm title={"Delete request"}
                                     description={"Are you sure you want to delete this leave request?"} okText={"Yes"}
                                     cancelText={"No"}
                                     onConfirm={() => deleteRequest(record.id)}
+                                    disabled={record.status != "pending"}
                         >
-                            <Button danger icon={<DeleteOutlined/>}></Button>
+                            <Button danger icon={<DeleteOutlined/>} disabled={record.status != "pending"}></Button>
                         </Popconfirm>
                     </span>
                 ) : null
@@ -148,7 +179,8 @@ const RequestPage: React.FC = () => {
             >
                 <Title>Requests</Title>
                 <div style={{textAlign: "right", marginRight: "1em", marginBottom: "2em"}}>
-                    <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'} disabled={userInfo.is_admin}
+                    <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'}
+                            disabled={userInfo.is_admin}
                             onClick={() => setCreateModalOpen(true)}>
                         New Request
                     </Button>
