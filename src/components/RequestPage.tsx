@@ -14,6 +14,7 @@ type UserInfo = {
     username: string;
     full_name: string;
     remaining_leave_days: string;
+    is_admin: boolean;
 };
 
 type TableKey = {
@@ -33,7 +34,7 @@ const RequestPage: React.FC = () => {
     const token = localStorage.getItem('token')
     const [requests, setRequests] = useState<any[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [userInfo, setUserInfo] = useState<UserInfo>({id: "", username: "", full_name: "", remaining_leave_days: ""});
+    const [userInfo, setUserInfo] = useState<UserInfo>({id: "", username: "", full_name: "", remaining_leave_days: "", is_admin: false});
 
     async function getUserData() {
         return await axios.get("http://localhost:8000/api/get-current-user", {headers: {Authorization: `Bearer ${token}`}});
@@ -41,7 +42,6 @@ const RequestPage: React.FC = () => {
 
     async function createRequest(values: any) {
         try {
-            console.log(values.start_date)
             const data = {
                 start_date: values.start_date,
                 end_date: values.end_date,
@@ -148,7 +148,7 @@ const RequestPage: React.FC = () => {
             >
                 <Title>Requests</Title>
                 <div style={{textAlign: "right", marginRight: "1em", marginBottom: "2em"}}>
-                    <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'}
+                    <Button type="primary" shape="round" icon={<PlusOutlined/>} size={'large'} disabled={userInfo.is_admin}
                             onClick={() => setCreateModalOpen(true)}>
                         New Request
                     </Button>
