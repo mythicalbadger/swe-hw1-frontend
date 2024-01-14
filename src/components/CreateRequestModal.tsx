@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Button, DatePicker, Form, Input, message, Modal} from 'antd';
 import axios from "axios";
 import delay from "../utils/delay";
+import moment from "moment";
 
 interface CreateRequestModalProps {
     createModalOpen: boolean;
@@ -50,7 +51,12 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = (props) => {
                         name="start_date"
                         rules={[{required: true, message: 'Please select a start date!'}]}
                     >
-                        <DatePicker/>
+                        <DatePicker
+                            disabledDate={(current: any) => {
+                                return moment().add(-1, 'days') >= current ||
+                                    moment().add(1, 'month') <= current;
+                            }}
+                        />
                     </Form.Item>
 
                     <Form.Item<FieldType>
@@ -58,7 +64,12 @@ const CreateRequestModal: React.FC<CreateRequestModalProps> = (props) => {
                         name="end_date"
                         rules={[{required: true, message: 'Please select an end date!'}]}
                     >
-                        <DatePicker/>
+                        <DatePicker
+                            disabledDate={(current: any) => {
+                                return moment().add(-1, 'days') >= current ||
+                                    moment().add(1, 'month') <= current;
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item<FieldType>
                         label="Reason"
