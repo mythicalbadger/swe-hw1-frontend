@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {Button, Form, Input, Layout, message} from 'antd';
-import axios from "axios";
+import {Button, Form, Input, Layout} from 'antd';
 import {useNavigate} from "react-router-dom";
 import delay from "../utils/delay";
+import {UserAPI} from "../apis/userAPI";
 
 const {Content} = Layout;
 
@@ -17,30 +17,13 @@ const RegisterPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     const onSubmit = async (values: any) => {
-        try {
-            setLoading(true);
+        setLoading(true);
 
-            await axios.post('http://localhost:8000/register', {
-                username: values.username,
-                full_name: values.full_name,
-                password: values.password
-            });
-            message.success("Success");
-            await delay(1000);
-            navigate("/login")
-        } catch (error: any) {
-            console.error('Login failed', error);
+        await UserAPI.register(values.full_name, values.username, values.password);
 
-            if (error.response) {
-                message.error(error.response.data.detail);
-            } else if (error.request) {
-                message.error('Network error, please try again.');
-            } else {
-                message.error('An error occurred, please try again later.');
-            }
-        } finally {
-            setLoading(false);
-        }
+        setLoading(false);
+
+        navigate("/login")
     }
 
     return (

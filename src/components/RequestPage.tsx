@@ -2,11 +2,11 @@ import React, {useState} from 'react';
 import {Button, Layout, message, Popconfirm, Table, theme} from 'antd';
 import Title from "antd/es/typography/Title";
 import {CheckOutlined, CloseOutlined, PlusOutlined} from '@ant-design/icons';
-import axios from "axios";
 import CreateRequestModal from "./CreateRequestModal";
 import {EditOutlined, DeleteOutlined} from '@ant-design/icons';
-import delay from "../utils/delay";
 import {useNavigate} from "react-router-dom";
+import {UserAPI} from "../apis/userAPI";
+import {LeaveRequestAPI} from "../apis/leaveRequestAPI";
 
 const {Content} = Layout;
 
@@ -32,7 +32,6 @@ const RequestPage: React.FC = () => {
         token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
 
-    const token = localStorage.getItem('token')
     const [requests, setRequests] = useState<any[]>([]);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -42,62 +41,35 @@ const RequestPage: React.FC = () => {
         remaining_leave_days: "",
         is_admin: false
     });
-    const navigate = useNavigate();
-
-    async function getUserData() {
-        return await axios.get("http://localhost:8000/api/get-current-user", {headers: {Authorization: `Bearer ${token}`}});
-    }
 
     async function createRequest(values: any) {
-        try {
-            const data = {
-                start_date: values.start_date,
-                end_date: values.end_date,
-                reason: values.reason
-            }
-            const response = await axios.post('http://localhost:8000/api/create-leave-request', data, {headers: {Authorization: `Bearer ${token}`}});
-
-            message.success("Success");
-            await delay(1000);
-            setCreateModalOpen(false);
-            const newRequests = [...requests, response.data];
-            setRequests(newRequests);
-
-        } catch (error: any) {
-            console.error('Login failed', error);
-
-            if (error.response) {
-                message.error(error.response.data.detail);
-            } else if (error.request) {
-                message.error('Network error, please try again.');
-            } else {
-                message.error('An error occurred, please try again later.');
-            }
-        }
+        const response = await LeaveRequestAPI.createRequest(values);
+        setCreateModalOpen(false);
+        const newRequests = [...requests, response?.data];
+        setRequests(newRequests);
     }
 
     async function deleteRequest(request_id: string) {
-        await axios.delete(`http://localhost:8000/api/delete-leave-request/${request_id}`, {headers: {Authorization: `Bearer ${token}`}});
+        await LeaveRequestAPI.deleteRequest(request_id);
         setRequests(requests.filter((request: TableKey) => request.id != request_id));
     }
 
     async function approveRequest(request_id: string) {
-        await axios.put(`http://localhost:8000/api/approve-leave-request/${request_id}`, null, {headers: {Authorization: `Bearer ${token}`}});
+        await LeaveRequestAPI.approveRequest(request_id);
         window.location.reload();
     }
 
     async function denyRequest(request_id: string) {
-        await axios.put(`http://localhost:8000/api/deny-leave-request/${request_id}`, null, {headers: {Authorization: `Bearer ${token}`}});
-        navigate("/");
+        await LeaveRequestAPI.denyRequest(request_id);
         window.location.reload();
     }
 
     React.useEffect(() => {
-        getUserData().then((response) => {
-            setUserInfo(response.data)
+        UserAPI.getUserInfo().then((response) => {
+            setUserInfo(response?.data)
         });
-        axios.get("http://localhost:8000/api/get-all-leave-requests", {headers: {Authorization: `Bearer ${token}`}}).then((response) => {
-            setRequests(response.data)
+        LeaveRequestAPI.getAllLeaveRequests().then((response) => {
+            setRequests(response?.data)
         })
     }, [])
 
@@ -153,7 +125,8 @@ const RequestPage: React.FC = () => {
                 }
                 return (requests.length > 0 && record.requester_id === userInfo.id) ? (
                     <span>
-                        <Button icon={<EditOutlined/>} disabled={record.status != "pending"} style={{ marginRight: "5%" }}></Button>
+                        <Button icon={<EditOutlined/>} disabled={record.status != "pending"}
+                                style={{marginRight: "5%"}}></Button>
                         <Popconfirm title={"Delete request"}
                                     description={"Are you sure you want to delete this leave request?"} okText={"Yes"}
                                     cancelText={"No"}

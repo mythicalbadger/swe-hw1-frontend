@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Layout, theme} from 'antd';
-import axios from "axios";
+import {Layout} from 'antd';
+import {UserAPI} from "../apis/userAPI";
 
 const {Content} = Layout;
 
@@ -11,16 +11,11 @@ type UserInfo = {
 };
 
 const ProfilePage: React.FC = () => {
-    const token = localStorage.getItem('token')
     const [userInfo, setUserInfo] = useState<UserInfo>({username: "", full_name: "", remaining_leave_days: ""});
 
-    async function getUserData() {
-        return await axios.get("http://localhost:8000/api/get-current-user", {headers: {Authorization: `Bearer ${token}`}});
-    }
-
     React.useEffect(() => {
-        getUserData().then((response) => {
-            setUserInfo(response.data)
+        UserAPI.getUserInfo().then((response) => {
+            setUserInfo(response?.data)
         });
     }, [])
 

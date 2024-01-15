@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {Button, Form, Input, Layout, message} from 'antd';
-import axios from "axios";
+import {Button, Form, Input, Layout} from 'antd';
 import {useNavigate} from "react-router-dom";
-import delay from "../utils/delay";
+import {UserAPI} from "../apis/userAPI";
 
 const {Content} = Layout;
 
@@ -11,37 +10,24 @@ type FieldType = {
     password?: string;
 };
 
+type LoginDetails = {
+    username: string;
+    password: string;
+}
+
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const onSubmit = async (values: any) => {
-        try {
-            setLoading(true);
+    const onSubmit = async (values: LoginDetails) => {
+        setLoading(true);
 
-            const formData = new FormData();
-            formData.append("username", values.username);
-            formData.append("password", values.password);
+        const response = await UserAPI.login(values.username, values.password);
+        localStorage.setItem("token", response?.data["access_token"]);
 
-            const response = await axios.post('http://localhost:8000/token', formData);
+        setLoading(false);
 
-            message.success("Success");
-            localStorage.setItem("token", response.data["access_token"]);
-            await delay(1000);
-            navigate("/")
-        } catch (error: any) {
-            console.error('Login failed', error);
-
-            if (error.response) {
-                message.error(error.response.data.detail);
-            } else if (error.request) {
-                message.error('Network error, please try again.');
-            } else {
-                message.error('An error occurred, please try again later.');
-            }
-        } finally {
-            setLoading(false);
-        }
+        navigate("/");
     }
 
     return (
