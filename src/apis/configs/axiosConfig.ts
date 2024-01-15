@@ -1,19 +1,19 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const api = axios.create({
-    baseURL: "http://localhost:8000"
+  baseURL: "http://localhost:8000",
 });
 
 const errorHandler = (error: any) => {
-    const statusCode = error.response?.status
+  const statusCode = error.response?.status;
 
-    if (statusCode) {
-        console.error(error)
-    }
+  if (statusCode) {
+    console.error(error);
+  }
 
-    return Promise.reject(error)
-}
+  return Promise.reject(error);
+};
 
 api.interceptors.response.use(undefined, (error) => {
-  return errorHandler(error)
-})
+  return errorHandler(error);
+});
