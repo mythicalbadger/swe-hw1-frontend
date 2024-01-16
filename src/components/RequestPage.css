@@ -1,0 +1,7 @@
+.approved-row {
+    background-color: rgba(173, 248, 173, 0.3);
+}
+
+.denied-row {
+    background-color: rgba(246, 170, 170, 0.38);
+}

@@ -23,11 +23,12 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     const response = await UserAPI.login(values.username, values.password);
-    localStorage.setItem("token", response?.data["access_token"]);
 
+    if (response) {
+      localStorage.setItem("token", response?.data["access_token"]);
+      navigate("/");
+    }
     setLoading(false);
-
-    navigate("/");
   };
 
   return (

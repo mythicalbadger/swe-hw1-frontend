@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Layout, Popconfirm, Table, theme } from "antd";
 import Title from "antd/es/typography/Title";
+import './RequestPage.css';
 import {
   CheckOutlined,
   CloseOutlined,
@@ -198,7 +199,17 @@ const RequestPage: React.FC = () => {
             handleCancel={() => setCreateModalOpen(false)}
           />
         </div>
-        <Table dataSource={requests} columns={columns} />;
+        <Table dataSource={requests} columns={columns} rowClassName={(record) => {
+          switch (record.status) {
+            case "approved":
+              return "data-row approved-row"
+            case "denied":
+              return "data-row denied-row"
+            default:
+              return "data-row"
+          }
+
+        }}/>;
       </div>
     </Content>
   );
